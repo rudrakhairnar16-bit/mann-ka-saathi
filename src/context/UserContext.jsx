@@ -1,42 +1,29 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
-// Create Context
 const UserContext = createContext();
 
-// Provider
 export function UserProvider({ children }) {
-  const [userName, setUserName] = useState('');
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [currentProblem, setCurrentProblem] = useState('');
-  const [assessmentResults, setAssessmentResults] = useState(null);
+  // LocalStorage se naam check karega, nahi to empty rahega
+  const [userName, setUserName] = useState(() => {
+    return localStorage.getItem('userName') || '';
+  });
 
-  const saveUserName = (name) => {
-    setUserName(name);
-    localStorage.setItem('mannkasaathi_name', name);
-  };
-
-  const completeOnboarding = () => {
-    setHasCompletedOnboarding(true);
-    localStorage.setItem('mannkasaathi_onboarded', 'true');
-  };
+  // Jab bhi naam change hoga, usko local storage mein save kar dega
+  useEffect(() => {
+    if (userName) {
+      localStorage.setItem('userName', userName);
+    } else {
+      localStorage.removeItem('userName');
+    }
+  }, [userName]);
 
   return (
-    <UserContext.Provider value={{
-      userName,
-      saveUserName,
-      hasCompletedOnboarding,
-      completeOnboarding,
-      currentProblem,
-      setCurrentProblem,
-      assessmentResults,
-      setAssessmentResults,
-    }}>
+    <UserContext.Provider value={{ userName, setUserName }}>
       {children}
     </UserContext.Provider>
   );
 }
 
-// Custom Hook
 export function useUser() {
   return useContext(UserContext);
 }

@@ -2,32 +2,106 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import ChatBubble from '../components/ChatBubble';
+import { useLanguage } from '../context/LanguageContext';
+import { useUser } from '../context/UserContext';
 
 export default function Assessment() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const { userName } = useUser();
+  
   const [currentQ, setCurrentQ] = useState(0);
   const [score, setScore] = useState(0);
 
-  // Data se liye gaye questions (Chat style)
-  const questions = [
-    "Ek simple sawaal poochna tha... Pichhle 2 hafte mein kitni baar aisa feel hua ki kuch acha nahi lag raha?",
-    "Kya aapko apne manpasand kaamo mein interest kam lag raha hai?",
-    "Kya aapko neend aane mein ya sote rehne mein dikkat ho rahi hai?",
-    "Kya aapko lagta hai ki aap overthinking kar rahe hain aur dimag shant nahi ho raha?"
+  // Dynamic Question Data - Expanded to cover more emotional states
+  const assessmentData = [
+    {
+      id: 1,
+      // General feeling of sadness/hopelessness
+      question: {
+        hindi: `${userName}, एक छोटा सा सवाल... पिछले 2 हफ़्ते में कितनी बार ऐसा लगा कि कुछ अच्छा नहीं लग रहा या उदासी महसूस हुई?`,
+        english: `Hey ${userName}, a quick question... Over the last 2 weeks, how often have you felt down, depressed, or hopeless?`,
+        hinglish: `Ek simple sawaal poochna tha ${userName}... Pichhle 2 hafte mein kitni baar aisa feel hua ki kuch acha nahi lag raha?`
+      }
+    },
+    {
+      id: 2,
+      // Loss of interest (Anhedonia)
+      question: {
+        hindi: 'क्या आपको अपने मनपसंद कामों में या रोज़मर्रा की चीज़ों में दिलचस्पी कम लग रही है?',
+        english: 'Do you feel you have little interest or pleasure in doing things you usually enjoy?',
+        hinglish: 'Kya aapko apne manpasand kaamo mein interest kam lag raha hai?'
+      }
+    },
+    {
+      id: 3,
+      // Sleep disturbances
+      question: {
+        hindi: 'क्या आपको नींद आने में परेशानी हो रही है, या क्या आप बहुत ज़्यादा सो रहे हैं?',
+        english: 'Are you having trouble falling asleep, staying asleep, or perhaps sleeping too much?',
+        hinglish: 'Kya aapko neend aane mein ya sote rehne mein dikkat ho rahi hai?'
+      }
+    },
+    {
+      id: 4,
+      // Anxiety/Overthinking
+      question: {
+        hindi: 'क्या आपको लगता है कि आप बहुत ज्यादा सोच (Overthinking) रहे हैं और आपका दिमाग शांत नहीं हो रहा?',
+        english: 'Do you feel like you are overthinking and your mind just won’t calm down?',
+        hinglish: 'Kya aapko lagta hai ki aap overthinking kar rahe hain aur dimag shant nahi ho raha?'
+      }
+    },
+    {
+      id: 5,
+      // Energy levels/Fatigue
+      question: {
+        hindi: 'क्या आप बिना ज्यादा काम किए भी थका हुआ महसूस करते हैं?',
+        english: 'Do you feel tired or have little energy, even without doing much physical work?',
+        hinglish: 'Kya aap bina zyada kaam kiye bhi thaka hua feel karte hain?'
+      }
+    },
+    {
+      id: 6,
+      // Concentration issues
+      question: {
+        hindi: 'क्या आपको पढ़ाई, काम या टीवी देखने जैसी चीज़ों में ध्यान लगाने (Concentration) में दिक्कत हो रही है?',
+        english: 'Are you having trouble concentrating on things like reading, working, or watching TV?',
+        hinglish: 'Kya aapko kisi kaam mein focus karne ya concentrate karne mein dikkat aa rahi hai?'
+      }
+    },
+    {
+      id: 7,
+      // Feelings of worthlessness or guilt
+      question: {
+        hindi: 'क्या आपको कभी ऐसा लगता है कि आप किसी लायक नहीं हैं या आपने खुद को या अपने परिवार को निराश किया है?',
+        english: 'Do you ever feel bad about yourself — or that you are a failure or have let yourself or your family down?',
+        hinglish: 'Kya kabhi aisa lagta hai ki aap kisi kaam ke nahi hain ya aapne apni family ko disappoint kiya hai?'
+      }
+    }
   ];
 
-  // Scoring Logic: Option A=0, B=1, C=2, D=3
+  // Dynamic Options Data
   const options = [
-    { text: "Bilkul Nahi", points: 0, emoji: "🟢" },
-    { text: "Kabhi Kabhi", points: 1, emoji: "🟡" },
-    { text: "Aksar", points: 2, emoji: "🟠" },
-    { text: "Har Waqt", points: 3, emoji: "🔴" }
+    { points: 0, emoji: "🟢", text: { hindi: "बिल्कुल नहीं", english: "Not at all", hinglish: "Bilkul Nahi" } },
+    { points: 1, emoji: "🟡", text: { hindi: "कभी-कभी", english: "Several days", hinglish: "Kabhi Kabhi" } },
+    { points: 2, emoji: "🟠", text: { hindi: "अक्सर", english: "More than half the days", hinglish: "Aksar" } },
+    { points: 3, emoji: "🔴", text: { hindi: "हर वक़्त", english: "Nearly every day", hinglish: "Har Waqt" } }
   ];
+
+  // UI Header Text translation
+  const uiText = {
+    hindi: { title: 'मन का चेकअप', progress: 'सवाल' },
+    english: { title: 'Mind Checkup', progress: 'Question' },
+    hinglish: { title: 'Mann Ka Checkup', progress: 'Saathi Question' }
+  };
+  
+  const currentLang = language || 'english';
+  const t = uiText[currentLang];
 
   const handleAnswer = (points) => {
     const newScore = score + points;
     
-    if (currentQ < questions.length - 1) {
+    if (currentQ < assessmentData.length - 1) {
       setScore(newScore);
       setCurrentQ(currentQ + 1);
     } else {
@@ -45,7 +119,7 @@ export default function Assessment() {
             ←
           </button>
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '700', fontFamily: 'Poppins, sans-serif' }}>
-            Mann Ka Checkup
+            {t.title}
           </h2>
         </div>
         
@@ -53,12 +127,13 @@ export default function Assessment() {
         <div style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.3)', height: '6px', borderRadius: '10px' }}>
           <motion.div 
             initial={{ width: 0 }}
-            animate={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
+            animate={{ width: `${((currentQ + 1) / assessmentData.length) * 100}%` }}
+            transition={{ duration: 0.4 }}
             style={{ height: '100%', backgroundColor: 'white', borderRadius: '10px' }}
           />
         </div>
         <div style={{ textAlign: 'right', fontSize: '12px', marginTop: '4px', opacity: 0.9 }}>
-          Saathi Question {currentQ + 1}/{questions.length}
+          {t.progress} {currentQ + 1}/{assessmentData.length}
         </div>
       </div>
 
@@ -73,9 +148,9 @@ export default function Assessment() {
             transition={{ duration: 0.3 }}
           >
             <ChatBubble 
-              message={questions[currentQ]} 
+              message={assessmentData[currentQ].question[currentLang]} 
               sender="bot" 
-              timestamp="Just now" 
+              timestamp={new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
             />
           </motion.div>
         </AnimatePresence>
@@ -88,6 +163,9 @@ export default function Assessment() {
             <motion.button
               key={index}
               whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
               onClick={() => handleAnswer(opt.points)}
               style={{
                 width: '100%',
@@ -107,7 +185,7 @@ export default function Assessment() {
               }}
             >
               <span style={{ fontSize: '18px' }}>{opt.emoji}</span>
-              {opt.text}
+              {opt.text[currentLang]}
             </motion.button>
           ))}
         </div>
