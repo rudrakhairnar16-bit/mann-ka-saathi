@@ -88,15 +88,22 @@ export default function Onboarding() {
     }
   };
 
-  const tx = text[language];
+  const tx = text[language] || text.hinglish;
 
   const handleNameSubmit = () => {
     if (name.trim().length < 2) {
-      setNameError(t.nameError);
+      setNameError(tx.nameRequired); // Fixed crash issue here
       return;
     }
-    saveUserName(name.trim());
-    completeOnboarding();
+    
+    // --- MAIN CHANGE: LOGIN LOGIC ---
+    localStorage.setItem('mannkasaathi_user', name.trim());
+    
+    // Context update
+    if (saveUserName) saveUserName(name.trim());
+    if (completeOnboarding) completeOnboarding();
+    
+    // Direct Redirect to Chat
     navigate('/chat');
   };
 
@@ -244,7 +251,8 @@ export default function Onboarding() {
                     </p>
                     <p style={{
                       fontSize: '13px',
-                      color: '#666'
+                      color: '#666',
+                      margin: 0
                     }}>
                       {item.desc}
                     </p>
@@ -372,7 +380,7 @@ export default function Onboarding() {
                 }}>
                   {tx.askName}
                 </h2>
-                <p style={{ color: '#666', fontSize: '14px' }}>
+                <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>
                   {tx.nameDesc}
                 </p>
               </div>
@@ -411,7 +419,8 @@ export default function Onboarding() {
                   style={{
                     color: '#E53E3E',
                     fontSize: '14px',
-                    fontWeight: '600'
+                    fontWeight: '600',
+                    margin: 0
                   }}
                 >
                   ⚠️ {nameError}
@@ -445,7 +454,8 @@ export default function Onboarding() {
 
               <p style={{
                 fontSize: '12px',
-                color: '#aaa'
+                color: '#aaa',
+                margin: 0
               }}>
                 {tx.nameRequired}
               </p>

@@ -1,89 +1,166 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Community() {
   const navigate = useNavigate();
   const { language } = useLanguage();
 
-  // Pre-defined groups
-  const [forums, setForums] = useState([
-    { id: 1, title: language === 'hindi' ? 'चिंता समर्थन (Anxiety)' : 'Anxiety Support', members: '1.2k', icon: '🫂' },
-    { id: 2, title: language === 'hindi' ? 'तनाव प्रबंधन (Stress)' : 'Stress Management', members: '850', icon: '🧘‍♀️' },
-    { id: 3, title: language === 'hindi' ? 'सकारात्मक सोच' : 'Positive Thinking', members: '2.1k', icon: '✨' }
-  ]);
+  const currentLang = language || 'english';
 
-  // New Group States
-  const [showForm, setShowForm] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-
-  const handleCreateGroup = (e) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-
-    const newGroup = {
-      id: Date.now(),
-      title: newTitle,
-      members: '1',
-      icon: '💬'
-    };
-
-    setForums([newGroup, ...forums]);
-    setNewTitle('');
-    setShowForm(false);
+  // MULTILINGUAL UI TEXT
+  const uiText = {
+    hindi: {
+      title: 'कम्युनिटी सपोर्ट 🌍',
+      joinBtn: 'ज्वाइन करें',
+      enterChatBtn: 'चैट में जाएं',
+      notifTitle: 'नोटिफिकेशन्स',
+      notifMood: '✨ आज का मूड सेव किया? अपना सफर रिकॉर्ड करें!',
+      notifChallenge: '🎯 आपका आज का डेली चैलेंज वेट कर रहा है!'
+    },
+    english: {
+      title: 'Community Support 🌍',
+      joinBtn: 'Join',
+      enterChatBtn: 'Enter Chat',
+      notifTitle: 'Notifications',
+      notifMood: '✨ Did you save your mood today? Record your journey!',
+      notifChallenge: '🎯 Your daily challenge is waiting for you!'
+    },
+    hinglish: {
+      title: 'Community Support 🌍',
+      joinBtn: 'Join',
+      enterChatBtn: 'Enter Chat',
+      notifTitle: 'Notifications',
+      notifMood: '✨ Aaj ka mood save kiya? Apna safar record karein!',
+      notifChallenge: '🎯 Aapka aaj ka Daily Challenge wait kar raha hai!'
+    }
   };
+
+  const t = uiText[currentLang];
+
+  // SINGLE GLOBAL COMMUNITY
+  const globalCommunity = { 
+    id: 1, 
+    title: { hindi: 'मन का साथी यूनिवर्स', english: 'Mann Ka Saathi Universe', hinglish: 'Mann Ka Saathi Universe' }, 
+    status: { hindi: 'ग्लोबल सेफ स्पेस', english: 'Global Safe Space', hinglish: 'Global Safe Space' }, 
+    icon: '🌍' 
+  };
+
+  const [joinedGroups, setJoinedGroups] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Load Joined Status from Local Storage
+  useEffect(() => {
+    const savedJoined = JSON.parse(localStorage.getItem('mannkasaathi_joined_groups')) || [];
+    setJoinedGroups(savedJoined);
+  }, []);
+
+  // Handle Joining / Entering Chat
+  const handleAction = (id) => {
+    if (joinedGroups.includes(id)) {
+      navigate('/community-chat'); 
+    } else {
+      const updatedJoined = [...joinedGroups, id];
+      setJoinedGroups(updatedJoined);
+      localStorage.setItem('mannkasaathi_joined_groups', JSON.stringify(updatedJoined));
+    }
+  };
+
+  const isJoined = joinedGroups.includes(globalCommunity.id);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F7F9FC', padding: '20px', fontFamily: 'Nunito, sans-serif' }}>
-      
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <button onClick={() => navigate(-1)} style={{ border: 'none', background: 'white', padding: '10px 15px', borderRadius: '12px', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>←</button>
-          <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#2E3A45', margin: 0, fontFamily: 'Poppins, sans-serif' }}>
-            {language === 'hindi' ? 'कम्युनिटी सपोर्ट' : 'Community Support'} 🌍
-          </h1>
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px', position: 'relative' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <button onClick={() => navigate('/chat')} style={{ border: 'none', background: 'white', padding: '10px 15px', borderRadius: '12px', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', fontSize: '18px', color: '#5B8DEF' }}>
+              ←
+            </button>
+            <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#2E3A45', margin: 0, fontFamily: 'Poppins, sans-serif' }}>
+              {t.title}
+            </h1>
+          </div>
+
+          {/* Notification Bell */}
+          <div style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              style={{ background: 'white', border: 'none', fontSize: '20px', padding: '10px', borderRadius: '12px', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}
+            >
+              🔔
+              <span style={{ position: 'absolute', top: '5px', right: '5px', width: '8px', height: '8px', backgroundColor: '#E53E3E', borderRadius: '50%' }}></span>
+            </button>
+
+            {/* Notifications Dropdown */}
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  style={{ position: 'absolute', top: '50px', right: '0', width: '280px', backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', padding: '16px', zIndex: 100 }}
+                >
+                  <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#A0AEC0', borderBottom: '1px solid #EDF2F7', paddingBottom: '8px', fontFamily: 'Poppins, sans-serif' }}>
+                    {t.notifTitle}
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div onClick={() => navigate('/mood')} style={{ padding: '10px', backgroundColor: '#F7F9FC', borderRadius: '10px', fontSize: '13px', color: '#4A5568', cursor: 'pointer' }}>
+                      {t.notifMood}
+                    </div>
+                    <div onClick={() => navigate('/challenges')} style={{ padding: '10px', backgroundColor: '#F7F9FC', borderRadius: '10px', fontSize: '13px', color: '#4A5568', cursor: 'pointer' }}>
+                      {t.notifChallenge}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
-        <button 
-          onClick={() => setShowForm(!showForm)} 
-          style={{ backgroundColor: '#5B8DEF', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer' }}
-        >
-          {showForm ? 'Cancel' : '+ New Group'}
-        </button>
-      </div>
 
-      {/* Create Group Form */}
-      {showForm && (
-        <motion.form 
-          initial={{ opacity: 0, y: -10 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          onSubmit={handleCreateGroup}
-          style={{ backgroundColor: 'white', padding: '20px', borderRadius: '20px', marginBottom: '25px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', display: 'flex', gap: '10px' }}
+        {/* Single Global Community Card */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ backgroundColor: 'white', padding: '24px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', textAlign: 'center', alignItems: 'center' }}
         >
-          <input 
-            type="text" 
-            placeholder="Enter group name/topic..." 
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '2px solid #E5E7EB', outline: 'none' }}
-          />
-          <button type="submit" style={{ backgroundColor: '#7CBF9E', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer' }}>Create</button>
-        </motion.form>
-      )}
+          <div style={{ fontSize: '48px', backgroundColor: '#F0F4F8', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '24px' }}>
+            {globalCommunity.icon}
+          </div>
+          
+          <div>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '20px', color: '#2E3A45', fontWeight: '700', fontFamily: 'Poppins, sans-serif' }}>
+              {globalCommunity.title[currentLang]}
+            </h4>
+            <p style={{ margin: 0, fontSize: '14px', color: '#718096', fontWeight: '600' }}>
+              {globalCommunity.status[currentLang]}
+            </p>
+          </div>
 
-      {/* Forums List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        {forums.map((forum, index) => (
-          <motion.div key={forum.id} style={{ backgroundColor: 'white', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
-            <div style={{ fontSize: '26px', backgroundColor: '#F0F4F8', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>{forum.icon}</div>
-            <div style={{ flex: 1 }}>
-              <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#2E3A45', fontWeight: '700' }}>{forum.title}</h4>
-              <p style={{ margin: 0, fontSize: '13px', color: '#888' }}>{forum.members} members</p>
-            </div>
-            <button style={{ backgroundColor: '#7CBF9E', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '20px', fontWeight: '700', cursor: 'pointer' }}>Join</button>
-          </motion.div>
-        ))}
+          <button 
+            onClick={() => handleAction(globalCommunity.id)}
+            style={{ 
+              width: '100%',
+              backgroundColor: isJoined ? '#EDF2F7' : '#5B8DEF', 
+              color: isJoined ? '#4A5568' : 'white', 
+              border: 'none', 
+              padding: '16px', 
+              borderRadius: '16px', 
+              fontSize: '16px',
+              fontWeight: '700', 
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              fontFamily: 'Poppins, sans-serif',
+              boxShadow: isJoined ? 'none' : '0 4px 15px rgba(91, 141, 239, 0.3)'
+            }}
+          >
+            {isJoined ? t.enterChatBtn : t.joinBtn}
+          </button>
+        </motion.div>
+        
       </div>
     </div>
   );

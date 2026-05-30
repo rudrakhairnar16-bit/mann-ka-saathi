@@ -1,18 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
-import { useUser } from '../context/UserContext';
 
 export default function Home() {
   const navigate = useNavigate();
   const { language, toggleLanguage, t } = useLanguage();
-  const { userName } = useUser();
 
   const handleStart = () => {
-    if (userName) {
-      navigate('/chat');
+    const savedUser = localStorage.getItem('mannkasaathi_user');
+    
+    // Strict check: Agar naam exist karta hai aur empty nahi hai
+    if (savedUser && savedUser.trim() !== '') {
+      navigate('/chat'); 
     } else {
-      navigate('/onboarding');
+      navigate('/onboarding'); 
     }
   };
 
@@ -42,7 +43,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Main Card (Spacing Improved) */}
+      {/* Main Card */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -61,17 +62,16 @@ export default function Home() {
           gap: '30px'
         }}
       >
-        {/* Logo */}
         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity }}>
           <img src="/src/assets/logo.png" alt="Logo" style={{ width: '160px', height: '160px', objectFit: 'contain' }} />
         </motion.div>
 
         <div>
           <h1 style={{ fontSize: '36px', fontWeight: '800', color: '#2E3A45', fontFamily: 'Poppins, sans-serif', margin: '0 0 10px 0' }}>
-            {t.appName || 'Mann Ka Saathi'}
+            {t?.appName || 'Mann Ka Saathi'}
           </h1>
           <p style={{ fontSize: '18px', color: '#5B8DEF', fontFamily: 'Nunito, sans-serif', fontWeight: '700', margin: 0 }}>
-            {t.tagline || 'Dil Se Baat...'}
+            {t?.tagline || 'Dil Se Baat...'}
           </p>
         </div>
 
@@ -82,9 +82,21 @@ export default function Home() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleStart}
-          style={{ width: '100%', backgroundColor: '#5B8DEF', color: 'white', padding: '18px', borderRadius: '16px', fontSize: '20px', fontWeight: '700', border: 'none', cursor: 'pointer', fontFamily: 'Poppins, sans-serif', boxShadow: '0 6px 20px rgba(91, 141, 239, 0.4)' }}
+          style={{ 
+            width: '100%', 
+            backgroundColor: '#5B8DEF', 
+            color: 'white', 
+            padding: '18px', 
+            borderRadius: '16px', 
+            fontSize: '20px', 
+            fontWeight: '700', 
+            border: 'none', 
+            cursor: 'pointer', 
+            fontFamily: 'Poppins, sans-serif', 
+            boxShadow: '0 6px 20px rgba(91, 141, 239, 0.4)' 
+          }}
         >
-          {t.startButton || 'Start'} 💙
+          {t?.startButton || 'Start'} 💙
         </motion.button>
       </motion.div>
     </div>
