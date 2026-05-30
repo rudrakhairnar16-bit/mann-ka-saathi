@@ -15,6 +15,7 @@ import Resources from './pages/Resources';
 import SOS from './pages/SOS';
 import Journal from './pages/Journal';
 import Analytics from './pages/Analytics';
+import CommunityChat from './pages/CommunityChat';
 
 // Protected Route Logic
 const ProtectedRoute = ({ children }) => {
@@ -34,7 +35,7 @@ export default function App() {
             {/* Open Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/onboarding" element={<Onboarding />} />
-            
+            <Route path="/community-chat" element={<ProtectedRoute><CommunityChat /></ProtectedRoute>} />
             {/* SOS is open for emergencies */}
             <Route path="/sos" element={<SOS />} /> 
 

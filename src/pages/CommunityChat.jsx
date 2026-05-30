@@ -36,7 +36,7 @@ export default function CommunityChat() {
     }
   };
 
-  const t = uiText[currentLang];
+  const t = uiText[currentLang] || uiText.english;
 
   const [messages, setMessages] = useState([
     {

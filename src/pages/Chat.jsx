@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import ChatBubble from '../components/ChatBubble';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default function Chat() {
   const navigate = useNavigate();
@@ -49,12 +50,14 @@ export default function Chat() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const handleSend = () => {
+  // --- GEMINI 2.5 FLASH API LOGIC ---
+  const handleSend = async () => {
     if (!input.trim()) return;
 
+    const userText = input;
     const userMessage = {
       id: Date.now(),
-      text: input,
+      text: userText,
       sender: 'user',
       timestamp: getCurrentTime()
     };
@@ -63,47 +66,65 @@ export default function Chat() {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const botReplies = {
-        hindi: [
-          `समझ सकता हूं ${userName}... 🤗`,
-          'थोड़ा और बताओ...',
-          'मैं सुन रहा हूं 🙏',
-          'आप अकेले नहीं हैं 💙'
-        ],
-        english: [
-          `I understand ${userName}... 🤗`,
-          'Tell me a little more...',
-          'I am listening 🙏',
-          'You are not alone 💙'
-        ],
-        hinglish: [
-          `Samajh sakta hun ${userName}... 🤗`,
-          'Thoda aur batao yaar...',
-          'Main sun raha hun 🙏',
-          'Tum akele nahi ho 💙'
-        ]
-      };
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error("Gemini API Key missing! .env.local file check karein.");
+      }
 
-      const langReplies = botReplies[language] || botReplies.english;
-      const randomReply = langReplies[Math.floor(Math.random() * langReplies.length)];
+      const genAI = new GoogleGenerativeAI(apiKey);
+      
+      // Using the Gemini 2.5 Flash model as requested
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        systemInstruction: `You are "Mann Ka Saathi", a highly empathetic, warm, and non-judgmental mental health companion. The user's name is ${userName}. The user prefers to chat in ${language} (Hindi, English, or Hinglish). Your goal is to listen, validate their feelings, and offer gentle support. Keep responses concise (1 to 3 short sentences), conversational, and use appropriate emojis. Do not give medical diagnoses.`
+      });
+
+      // THE FIX: Ensure history ALWAYS starts with a 'user' message to avoid API crash & maintain context
+      const firstUserIndex = messages.findIndex(m => m.sender === 'user');
+      const validHistory = firstUserIndex !== -1 ? messages.slice(firstUserIndex) : [];
+
+      const formattedHistory = validHistory.map(m => ({
+        role: m.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }]
+      }));
+
+      // Start Chat Session with properly formatted History
+      const chatSession = model.startChat({
+        history: formattedHistory
+      });
+
+      // Send User Message to Gemini
+      const result = await chatSession.sendMessage(userText);
+      const responseText = result.response.text();
 
       const botMessage = {
         id: Date.now() + 1,
-        text: randomReply,
+        text: responseText,
         sender: 'bot',
         timestamp: getCurrentTime()
       };
 
       setMessages(prev => [...prev, botMessage]);
+
+    } catch (error) {
+      console.error("Gemini API Error:", error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: language === 'hindi' ? "माफ़ी चाहूंगा, अभी नेटवर्क में कुछ दिक्कत लग रही है। क्या आप अपनी बात फिर से कह सकते हैं? 🙏" : "I'm sorry, there seems to be a network issue. Could you please repeat that? 🙏",
+        sender: 'bot',
+        timestamp: getCurrentTime()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 2000);
+    }
   };
 
-  // Logout Logic: Clear Data & Redirect to Home/Onboarding
   const handleLogout = () => {
     localStorage.removeItem('mannkasaathi_user');
-    navigate('/'); 
+    window.location.href = '/'; // Hard refresh for proper logout
   };
 
   const moods = [
@@ -147,10 +168,8 @@ export default function Chat() {
                 <button onClick={() => navigate('/community')} style={{ textAlign: 'left', padding: '12px', border: 'none', backgroundColor: '#E2E8F0', borderRadius: '12px', color: '#2E3A45', fontWeight: '600', cursor: 'pointer' }}>🌍 Community</button>
                 <button onClick={() => navigate('/challenges')} style={{ textAlign: 'left', padding: '12px', border: 'none', backgroundColor: '#E2E8F0', borderRadius: '12px', color: '#2E3A45', fontWeight: '600', cursor: 'pointer' }}>🎯 Daily Challenges</button>
                 <button onClick={() => navigate('/resources')} style={{ textAlign: 'left', padding: '12px', border: 'none', backgroundColor: '#E2E8F0', borderRadius: '12px', color: '#2E3A45', fontWeight: '600', cursor: 'pointer' }}>📖 Resources</button>
-                
                 <button onClick={() => navigate('/journal')} style={{ textAlign: 'left', padding: '12px', border: 'none', backgroundColor: '#E2E8F0', borderRadius: '12px', color: '#2E3A45', fontWeight: '600', cursor: 'pointer' }}>✍️ Private Journal</button>
                 <button onClick={() => navigate('/analytics')} style={{ textAlign: 'left', padding: '12px', border: 'none', backgroundColor: '#E2E8F0', borderRadius: '12px', color: '#2E3A45', fontWeight: '600', cursor: 'pointer' }}>📊 Visual Analytics</button>
-                
                 <button onClick={() => navigate('/sos')} style={{ textAlign: 'left', padding: '12px', border: 'none', backgroundColor: '#FFF5F5', borderRadius: '12px', color: '#E53E3E', fontWeight: '700', cursor: 'pointer' }}>🆘 SOS Emergency</button>
               </div>
 
@@ -190,7 +209,7 @@ export default function Chat() {
 
         {isTyping && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '16px' }}>
-            <div style={{ backgroundColor: '#4A76D2', padding: '14px 18px', borderRadius: '20px 20px 20px 6px', color: 'white' }}>
+            <div style={{ backgroundColor: '#2E3A45', padding: '14px 18px', borderRadius: '20px 20px 20px 6px', color: 'white' }}>
               <div style={{ display: 'flex', gap: '4px' }}>
                 {[1,2,3].map((dot) => (
                   <motion.div key={dot} animate={{ y: [0, -5, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: dot * 0.1 }} style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'white' }} />

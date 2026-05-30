@@ -96,7 +96,7 @@ export default function Home() {
             boxShadow: '0 6px 20px rgba(91, 141, 239, 0.4)' 
           }}
         >
-          {t?.startButton || 'Start'} 💙
+          {t?.startButton || 'Start'} ❤️
         </motion.button>
       </motion.div>
     </div>
