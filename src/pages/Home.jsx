@@ -63,7 +63,17 @@ export default function Home() {
         }}
       >
         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-          <img src="/src/assets/logo.png" alt="Logo" style={{ width: '160px', height: '160px', objectFit: 'contain' }} />
+          <img 
+  src="/logo.png" 
+  alt="Mann Ka Saathi Logo" 
+  style={{ 
+    width: '120px', 
+    height: '120px', 
+    marginBottom: '20px', 
+    borderRadius: '50%',
+    objectFit: 'cover' // Image ko stretch hone se rokne ke liye
+  }} 
+/>
         </motion.div>
 
         <div>
