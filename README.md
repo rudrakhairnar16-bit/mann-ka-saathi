@@ -1,42 +1,31 @@
-<<<<<<< HEAD
-# React + Vite
+# 🤲 Mann Ka Saathi (Your Mental Wellness Companion)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Mann Ka Saathi** is an AI-powered, empathetic mental health and wellness platform designed to provide a safe space for users to express their feelings, track their mood, and seek emotional support. Powered by the Google Gemini API, it acts as a bilingual virtual companion (Hindi, English, Hinglish) that listens, understands, and responds with care.
 
-Currently, two official plugins are available:
+![Mann Ka Saathi Preview](public/logo.png) ## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# mann-ka-saathi
-"Mann Ka Saathi" is an AI-powered conversational web app providing accessible mental wellness support. It acts as a safe space for discussing stress, anxiety, and depression. Featuring mental health assessments, mood tracking, and wellness challenges, it helps users manage their emotional well-being in a judgment-free environment.
-# 🌟 Mann Ka Saathi - "Dil Se Baat, Heart To Heart"
-
-"Mann Ka Saathi" is a conversational web application that provides accessible mental wellness support. It helps users understand, track, and manage their emotional stress.
-
-## 🚀 Features
-* **Multilingual Support:** Hindi, English, and Hinglish.
-* **Smart Chatbot:** Emotional loop detection and rule-based support.
-* **Conversational Assessments:** 10+ mental health tests in a chat interface.
-* **Mood Tracker:** Daily tracking with a history log.
-* **Daily Wellness Challenges:** Positive tasks to boost mental health.
-* **Emergency Safety:** Crisis keywords trigger instant helpline resources.
+- **💬 AI Chatbot (Gemini Powered):** Context-aware, empathetic conversations that remember user preferences and respond in their preferred language.
+- **📊 Mood Tracker & Visual Analytics:** Users can track their daily emotional state using intuitive emoji selectors. Interactive graphs (`recharts`) visualize a 7-day mood trend.
+- **✨ Daily Affirmations:** Scientifically backed positive quotes that update daily to boost the user's mood.
+- **🆘 Emergency Resources:** A dedicated SOS section providing immediate access to professional mental health helplines.
+- **📱 PWA (Progressive Web App):** Fully installable on Android, iOS, and Desktop. Works like a native app with a custom icon and splash screen.
+- **🎨 Modern UI/UX:** Smooth animations using `Framer Motion`, auto-scrolling chat, and a beautiful, soothing color palette.
+- **🔒 Privacy First:** Localized user state management for a seamless and private onboarding experience.
 
 ## 🛠️ Tech Stack
-* **Frontend:** React.js, Vite
-* **Animations:** Framer Motion
-* **Deployment:** Vercel
 
-## 💡 How to Run Locally
-1. Clone the repo: `git clone https://github.com/your-username/mann-ka-saathi.git`
-2. Install dependencies: `npm install`
-3. Start the project: `npm run dev`
->>>>>>> 2db3caf96eea032bf2a549823ce7bd29ebb77f6e
+- **Frontend:** React.js, Vite
+- **Styling & Animations:** Framer Motion (for smooth bubble transitions & typing indicators)
+- **Data Visualization:** Recharts
+- **AI Integration:** Google Generative AI (Gemini API)
+- **PWA Capabilities:** vite-plugin-pwa
+- **Deployment:** Vercel
+
+## ⚙️ Installation & Setup (Local Development)
+
+Follow these steps to run the project on your local machine:
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/your-username/mann-ka-saathi.git](https://github.com/your-username/mann-ka-saathi.git)
+   cd mann-ka-saathi
